@@ -3,8 +3,13 @@ package com.willpaul;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+
+import java.util.Iterator;
+import java.util.ServiceLoader;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.Mixer.Info;
+import javax.sound.sampled.spi.MixerProvider;
 
 public class App {
     // c+p from https://stackoverflow.com/questions/23096533/how-to-play-a-sound-with-a-given-sample-rate-in-java
@@ -46,12 +51,21 @@ public class App {
             System.out.println(info);
         }
 
+        Class<MixerProvider> provider = MixerProvider.class;
+
+        Iterator<MixerProvider> providersIter = ServiceLoader.load(provider).iterator();
+        System.out.println("Iterator has next: " + providersIter.hasNext());
+
+        while(providersIter.hasNext()) {
+          System.out.println("Found: " + providersIter.next().getClass().getName()); // THIS would fail as no class found
+        }
+
+        // To get the java home error
+        tone(1000,100);
+        Thread.sleep(1000);
+
         System.out.println(mixerInfos.length);
         if (mixerInfos.length == 0)
             throw new AssertionError("no mixers available");
-
-        // To get the java home error
-        // tone(1000,100);
-        // Thread.sleep(1000);
     }
 }
